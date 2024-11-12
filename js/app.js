@@ -127,6 +127,24 @@ for (let i = 0; i < buttons.length; i++) {
 
 // start event section
 
+// start announcement
+
+$(".toggle-text").click(function(event) {
+    event.preventDefault();
+
+    const cardText = $(this).closest(".card-text");
+
+    cardText.find(".truncated-text, .full-text").toggleClass("d-none");
+
+    if ($(this).text() === "read more") {
+        $(this).text("read less");
+    } else {
+        $(this).text("read more");
+    }
+});
+
+// end announcement
+
 // start footer section
 
 const getyear = document.getElementById("getyear");
