@@ -3,11 +3,6 @@ session_start();
 
 include('mysql/db_connect.php');
 
-// Check if user is logged in
-// if (!isset($_SESSION['user_id'])) {
-//     header("Location: login.php");
-//     exit();
-// }
 
 ?>
 
@@ -20,13 +15,14 @@ include('mysql/db_connect.php');
     <!-- fav icon -->
     <link rel="icon" href="./assets/img/fav/favicon.png" type="image/png" sizes="16x16">
     <!-- bootstrap css1 js1 -->
-    <link rel="stylesheet" href="./assets/libs/bootstrap-5.3.2-dist/css/bootstrap.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- fontawsome css1 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- jquery ui css1 js1 -->
     <link rel="stylesheet" href="./assets/libs/jquery-ui-1.13.2/jquery-ui.min.css">
     <!-- lightbox2 css1 js1 -->
     <link rel="stylesheet" href="./assets/libs/lightbox2-2.11.4/dist/css/lightbox.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <!-- custom css -->
     <link rel="stylesheet" href="./css/style.css" type="text/css">
     
@@ -77,7 +73,7 @@ include('mysql/db_connect.php');
                                         <span class="text-white" style="margin-left: 10px;"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <li><a href="editProfile.php" class="dropdown-item">Edit Profile</a></li>
+                                        <li><a href="userProfile.php" class="dropdown-item">Edit Profile</a></li>
                                         <li><a href="logout.php" class="dropdown-item">Logout</a></li>
                                     </ul>
                                 </li>
@@ -330,7 +326,7 @@ include('mysql/db_connect.php');
 
 
     <!-- bootstrap css1 js1 -->
-    <script src="./assets/libs/bootstrap-5.3.2-dist/js/bootstrap.bundle.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jquery js1 -->
     <script src="./assets/libs/jquery/jquery-3.7.1.min.js" type="text/javascript"></script>
     <!-- jquery ui css1 js1 -->

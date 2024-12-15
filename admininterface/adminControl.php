@@ -1,6 +1,6 @@
 <?php
 session_start();
-include('../backend/db_connection.php');
+include('../mysql/db_connect.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $id = $_POST['id'];

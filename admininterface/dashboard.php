@@ -1,16 +1,16 @@
 <?php
 session_start();
 
-include('../backend/db_connection.php');
+include('../mysql/db_connect.php');
 
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != 1) {
-    header('Location: ../home.php');
+    header('Location: ../index.php');
     exit();
 }
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id'])) {
-    header("Location: login.php");
+    header("Location: ../login.php");
     exit();
 }
 
@@ -30,7 +30,7 @@ $result_total_users = $conn->query($query_total_users);
 $total_users = $result_total_users->fetch_assoc()['total_users'];
 
 // Fetch all events from the events table
-$query_events = "SELECT id, event_name, date, time, location, activities, age_group, description FROM events";
+$query_events = "SELECT id, title, event_date, time, location, age_group FROM events";
 $result_events = $conn->query($query_events);
 
 if (!$result_events) {
@@ -46,8 +46,8 @@ if (!$result_users) {
 }
 
 
-// Fetch registrations from pending_registers and registers
-$query_pending = "SELECT * FROM pending_registers";
+// Fetch registrations from pending_users and registers
+$query_pending = "SELECT * FROM pending_users";
 $result_pending = $conn->query($query_pending);
 
 $query_approved = "SELECT * FROM registers";
@@ -98,11 +98,15 @@ foreach ($allRegistrations as $key => $register) {
     <!-- fav icon -->
     <link rel="icon" href="../assets/img/fav/favicon.png" type="image/png" sizes="16x16">
     <!-- bootstrap css1 js1 -->
-    <link rel="stylesheet" href="../assets/libs/bootstrap-5.3.2-dist/css/bootstrap.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- fontawsome css1 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- jquery ui css1 js1 -->
     <link rel="stylesheet" href="../assets/libs/jquery-ui-1.13.2/jquery-ui.min.css">
+    <!-- lightbox2 css1 js1 -->
+    <link rel="stylesheet" href="../assets/libs/lightbox2-2.11.4/dist/css/lightbox.min.css">
+    <!-- custom css -->
+    <link rel="stylesheet" href="../css/style.css" type="text/css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     
 
@@ -138,38 +142,70 @@ foreach ($allRegistrations as $key => $register) {
                 <div class="bg-light lines3"></div>
             </button>
 
-            <div id="nav" class="navbar-collapse collapse justify-content-end text-uppercase fw-bold">
-                <ul class=" navbar-nav">
-                    <li class="nav-item"><a href="../index.php" class="nav-link mx-2 menuitems">Home</a></li>
-                    <li class="nav-item"><a href="../aboutus.php" class="nav-link mx-2 menuitems">About Us</a></li>
-                    <li class="nav-item"><a href="../announcement.php" class="nav-link mx-2 menuitems">News & Announcements</a></li>
-                    <li class="nav-item"><a href="../events.php" class="nav-link mx-2 menuitems">Events</a></li>
-                    <li class="nav-item"><a href="../contactus.php" class="nav-link mx-2 menuitems">Contact</a></li>
-                </ul>
-            </div>
+            <div id="nav" class="navbar-collapse collapse d-flex justify-content-between align-items-center text-uppercase fw-bold">
+                        <ul class="navbar-nav d-flex align-items-center mb-0">
+                            <li class="nav-item"><a href="../index.php" class="nav-link mx-2 menuitems">Home</a></li>
+                            <li class="nav-item"><a href="../aboutus.php" class="nav-link mx-2 menuitems">About Us</a></li>
+                            <li class="nav-item"><a href="../announcement.php" class="nav-link mx-2 menuitems">News & Announcements</a></li>
+                            <li class="nav-item"><a href="../events.php" class="nav-link mx-2 menuitems">Events</a></li>
+                            <li class="nav-item"><a href="../contactus.php" class="nav-link mx-2 menuitems">Contact</a></li>
+                            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+                                <li class="nav-item"><a href="dashboard.php" class="nav-link mx-2 menuitems">Dashboard</a></li>
+                            <?php endif; ?>
+                        </ul>
+                        <ul class="navbar-nav d-flex align-items-center mb-0">
+                            <?php if (isset($_SESSION['name'])): ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle align-icon" style="font-size: 1.5rem;"></i>
+                                        <span class="text-white" style="margin-left: 10px;"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <li><a href="../userProfile.php" class="dropdown-item">Edit Profile</a></li>
+                                        <li><a href="../logout.php" class="dropdown-item">Logout</a></li>
+                                    </ul>
+                                </li>
+                            <?php else: ?>
+                            <li class="nav-item">
+                                    <a href="../login.php" class="nav-link">
+                                        <i class="bi bi-person-circle align-icon" style="font-size: 1.5rem;"></i> Login
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                            
+                    </div>
 
         </nav>
     <!-- end Nav bar -->
 
 
-    <div class="container mt-5 pt-5">
-    <h1 class="mb-4 mt-5 text-center text-primary">Admin Interface</h1>
+<div class="container mt-5 pt-5">
+    <h1 class="mb-4 mt-5 text-center text-primary text-uppercase">Admin Interface</h1>
     
     <!-- Statistics Section -->
     <div class="row g-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card bg-info text-white shadow-sm">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Users</h5>
-                    <p class="card-text fs-4 fw-bold">{{ $totalUsers }}</p>
+                    <p class="card-text fs-4 fw-bold"><?php echo $total_users; ?></p>
                 </div>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="card bg-success text-white shadow-sm">
                 <div class="card-body text-center">
                     <h5 class="card-title">Total Events</h5>
-                    <p class="card-text fs-4 fw-bold">{{ $totalEvents }}</p>
+                    <p class="card-text fs-4 fw-bold"><?php echo $total_events; ?></p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card bg-warning text-white shadow-sm">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Total Registers</h5>
+                    <p class="card-text fs-4 fw-bold"><?php echo $total_registrations; ?></p>
                 </div>
             </div>
         </div>
@@ -177,9 +213,9 @@ foreach ($allRegistrations as $key => $register) {
 
     <!-- Add Event Form -->
     <div class="mt-5">
-        <h2 class="text-secondary">New Event</h2>
+        <h2 class="text-secondary">New Events</h2>
 
-        <form action="{{ route('admin.events.store') }}" method="POST" enctype="multipart/form-data" class="p-4 bg-light rounded shadow-sm">
+        <form action="addEvent.php" method="POST" enctype="multipart/form-data" class="p-4 bg-light rounded shadow-sm">
             
             <div class="row g-3">
                 <div class="col-md-6">
@@ -231,25 +267,42 @@ foreach ($allRegistrations as $key => $register) {
                         <th>Date</th>
                         <th>Time</th>
                         <th>Location</th>
+                        <th>Age Group</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody class="text-center">
+                    <?php if ($result_events->num_rows > 0): ?>
+                        <?php while ($event = $result_events->fetch_assoc()): ?>
+                            <tr>
+                                <td class="align-middle"><?php echo htmlspecialchars($event['id']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($event['title']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($event['event_date']); ?></td>
+                                <td class="align-middle">
+                                    <?php
+                                        $time = new DateTime($event['time']);
+                                        echo $time->format('h:i A'); 
+                                    ?>
+                                </td>
+                                <td class="align-middle"><?php echo htmlspecialchars($event['location']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($event['age_group']); ?></td>
+                                <td>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-sm btn-primary btn-actions edit-btn" data-bs-toggle="modal" data-bs-target="#editEventModal" data-id="<?= $event['id']; ?>">
+                                             Edit
+                                        </button>
+                                        <button class="btn btn-sm btn-danger btn-actions delete-btn" data-id="<?= $event['id']; ?>">
+                                             Delete
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
                         <tr>
-                            <td class="align-middle">{{ $loop->iteration }}</td>
-                            <td class="align-middle">{{ $event->title }}</td>
-                            <td class="align-middle">{{ $event->event_date }}</td>
-                            <td class="align-middle">{{ $event->time }}</td>
-                            <td class="align-middle">{{ $event->location }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning " data-id="{{ $event->id }}" onclick="editEvent(this)">Edit</button>
-                                <form action="{{ route('admin.events.destroy', $event->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </td>
+                            <td colspan="9" class="text-center">No events found</td>
                         </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
@@ -273,68 +326,38 @@ foreach ($allRegistrations as $key => $register) {
                     </tr>
                 </thead>
                 <tbody class="text-center">
+                <?php if ($result_users->num_rows > 0): ?>
+                    <?php while ($user = $result_users->fetch_assoc()): ?>
+                            <tr>
+                                <td class="align-middle"><?php echo htmlspecialchars($user['id']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($user['name']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($user['email']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($user['preferred_sport']); ?></td>
+                                <td class="align-middle"><?php echo htmlspecialchars($user['skill_level']); ?></td>
+                                <td>
+                                    <button type="button" class="btn btn-sm btn-warning view-btn" data-bs-toggle="modal" data-bs-target="#viewMemberModal" data-id="<?= $user['id']; ?>">
+                                        View
+                                    </button>
+                                    <button type="submit" class="btn btn-sm btn-danger remove-btn" data-id="<?= $user['id']; ?>">
+                                        Remove
+                                    </button>
+                                </td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
                         <tr>
-                            <td class="align-middle">{{ $loop->iteration }}</td>
-                            <td class="align-middle">{{ $user->name }}</td>
-                            <td class="align-middle">{{ $user->email }}</td>
-                            <td class="align-middle">{{ $user->preferred_sport }}</td>
-                            <td class="align-middle">{{ $user->skill_level }}</td>
-                            <td>
-                                <button class="btn btn-sm btn-warning" data-id="{{ $user->id }}" onclick="editUser(this)">Edit</button>
-                                <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" style="display:inline;">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                                </form>
-                            </td>
+                            <td colspan="6" class="text-center">No members found</td>
                         </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
 
     </div>
 
-    <!-- Edit User Modal -->
-    <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <form id="userForm" method="POST">
-            @csrf
-            @method('PUT')
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="editUserModalLabel">Edit User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="name" class="form-label">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="email" class="form-control" id="email" name="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="preferred_sport" class="form-label">Preferred Sport</label>
-                        <input type="text" class="form-control" id="preferred_sport" name="preferred_sport">
-                    </div>
-                    <div class="mb-3">
-                        <label for="skill_level" class="form-label">Skill Level</label>
-                        <input type="text" class="form-control" id="skill_level" name="skill_level">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Changes</button>
-                </div>
-            </div>
-        </form>
-    </div>
-    </div>
-
     <!-- User Registration Section -->
 <div class="mt-5">
-    <h3 class="mt-5 text-secondary">User Registration</h3>
+    <h3 class="mt-5 text-secondary">Control Registration</h3>
     <div class="table-responsive">
         <table class="table table-bordered table-striped">
             <thead class="table-dark text-center">
@@ -344,25 +367,42 @@ foreach ($allRegistrations as $key => $register) {
                     <th>Age</th>
                     <th>Phone</th>
                     <th>Event ID</th>
+                    <th>Time</th>
                     <th>Action</th>
                 </tr>
             </thead>
             <tbody class="text-center">
+                <?php if (count($allRegistrations) > 0): ?>
+                    <?php foreach ($allRegistrations as $register): ?>
+                        <tr>
+                            <td class="align-middle"><?= htmlspecialchars($register['new_id']); ?></td>
+                            <td class="align-middle"><?= htmlspecialchars($register['name']); ?></td>
+                            <td class="align-middle"><?= htmlspecialchars($register['age']); ?></td>
+                            <td class="align-middle"><?= htmlspecialchars($register['phone']); ?></td>
+                            <td class="align-middle"><?= htmlspecialchars($register['event_id']); ?></td>
+                            <td class="align-middle">
+                                <?php 
+                                    $dateTime = new DateTime($register['updated_at']);
+                                    echo $dateTime->format('d M h:i A');
+                                ?>
+                            </td>
+                            <td>
+                                <?php if ($register['status'] == 'Approved'): ?>
+                                    <span class="text-success">Approved</span>
+                                <?php else: ?>
+                                    <div class="d-flex justify-content-center gap-2">
+                                        <button class="btn btn-sm btn-primary btn-approve" data-id="<?= $register['id']; ?>">Approve</button>
+                                        <button class="btn btn-sm btn-danger btn-reject" data-id="<?= $register['id']; ?>">Reject</button>
+                                    </div>
+                                <?php endif; ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                <?php else: ?>
                     <tr>
-                        <td class="align-middle">{{ $loop->iteration }}</td>
-                        <td class="align-middle">{{ $eu->name }}</td>
-                        <td class="align-middle">{{ $eu->age }}</td>
-                        <td class="align-middle">{{ $eu->phone }}</td>
-                        <td class="align-middle">{{ $eu->event_id }}</td>
-                        <td>
-                            <a class="btn btn-sm btn-warning" data-id="{{ $eu->id }}" onclick="editRegisterUser(this)">Edit</a>
-                            <form action="{{ route('registrations.destroy', $eu->id) }}" method="POST" style="display:inline;">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
-                            </form>
-                        </td>
+                        <td colspan="6" class="text-center">No registrations found</td>
                     </tr>
+                <?php endif; ?>
             </tbody>
         </table>
     </div>
@@ -374,15 +414,14 @@ foreach ($allRegistrations as $key => $register) {
 <!-- Edit Event Modal -->
 <div class="modal fade" id="editEventModal" tabindex="-1" aria-labelledby="editEventModalLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form id="eventEditForm" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
+        <form id="eventEditForm" action="editEvent.php" method="POST" enctype="multipart/form-data">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title" id="editEventModalLabel">Edit Event</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
+                    <input type="hidden" id="editEventId" name="editEventId">
                     <div class="mb-3">
                         <label for="edit_title" class="form-label">Event Title</label>
                         <input type="text" class="form-control" id="edit_title" name="title" required>
@@ -425,6 +464,38 @@ foreach ($allRegistrations as $key => $register) {
     </div>
 </div>
     
+
+<!-- View Member Modal -->
+<div class="modal fade" id="viewMemberModal" tabindex="-1" aria-labelledby="viewMemberModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h5 class="modal-title" id="viewMemberModalLabel">Member Details</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <!-- Modal Body -->
+        <div class="modal-body">
+          <ul class="list-group">
+            <li class="list-group-item"><strong>Name:</strong> <span id="modal-name"></span></li>
+            <li class="list-group-item"><strong>Email:</strong> <span id="modal-email"></span></li>
+            <li class="list-group-item"><strong>Signup Time: </strong> <span id="modal-signup-time"></span></li>
+            <li class="list-group-item"><strong>Preferred Sports:</strong> <span id="modal-preferred-sport"></span></li>
+            <li class="list-group-item"><strong>Skill Level:</strong> <span id="modal-skill-level"></span></li>
+          </ul>
+        </div>
+        <!-- Modal Footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+</div>
+
+<div class="container mt-3 mb-5">
+    <h1 class="text-center mb-3">Text U want to give title </h1>
+    <canvas id="registrationsChart"></canvas>
+</div>
 
     <!-- start footer section -->
 
@@ -485,88 +556,173 @@ foreach ($allRegistrations as $key => $register) {
     <!-- end footer section -->
 
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-     integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
-      crossorigin="anonymous"></script>
-      <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- bootstrap css1 js1 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jquery js1 -->
+    <script src="../assets/libs/jquery/jquery-3.7.1.min.js" type="text/javascript"></script>
+    <!-- jquery ui css1 js1 -->
+    <script src="../assets/libs/jquery-ui-1.13.2/jquery-ui.min.js" type="text/javascript"></script>
+    <!-- lightbox2 css1 js1 -->
+    <script src="../assets/libs/lightbox2-2.11.4/dist/js/lightbox.min.js" type="text/javascript"></script>
+    <!-- custom js -->
+    <script src="../js/app.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
 
     <script>
 
-function editEvent(button) {
-    const eventId = button.getAttribute('data-id');
+document.addEventListener('DOMContentLoaded', function () {
+    // Select all edit buttons
+    const editButtons = document.querySelectorAll('.edit-btn');
 
-    fetch(`/admin/events/${eventId}/edit`)
-        .then(response => response.json())
-        .then(data => {
-            // Populate the modal with the event data
-            document.getElementById('edit_title').value = data.title;
-            document.getElementById('edit_event_date').value = data.event_date;
-            document.getElementById('edit_time').value = data.time;
-            document.getElementById('edit_location').value = data.location;
-            document.getElementById('edit_sport').value = data.sport;
-            document.getElementById('edit_age_group').value = data.age_group;
-            document.getElementById('edit_description').value = data.description;
+    editButtons.forEach(button => {
+        button.addEventListener('click', function () {
+            const eventId = this.getAttribute('data-id');
 
-            // Update the form action to the correct route for the event
-            const form = document.getElementById('eventEditForm');
-            form.action = `/admin/events/${eventId}`;
-
-            // Show the modal
-            const modal = new bootstrap.Modal(document.getElementById('editEventModal'));
-            modal.show();
+            // Use AJAX to fetch event data from the server
+            fetch(`getEvent.php?id=${eventId}`)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('editEventId').value = data.id;
+                    document.getElementById('edit_title').value = data.title;
+                    document.getElementById('edit_event_date').value = data.event_date;
+                    document.getElementById('edit_time').value = data.time;
+                    document.getElementById('edit_location').value = data.location;
+                    document.getElementById('edit_sport').value = data.sport;
+                    document.getElementById('edit_age_group').value = data.age_group;
+                    document.getElementById('edit_description').value = data.description;
+                })
+                .catch(error => console.error('Error fetching event data:', error));
         });
-}
-
-function editUser(button) {
-        const userId = button.getAttribute('data-id');
-
-        fetch(`/admin/users/${userId}/edit`)
-            .then(response => response.json())
-            .then(data => {
-                // Populate form fields with user data
-                document.getElementById('name').value = data.name;
-                document.getElementById('email').value = data.email;
-                document.getElementById('preferred_sport').value = data.preferred_sport || '';
-                document.getElementById('skill_level').value = data.skill_level || '';
-
-                // Set form action to the update URL
-                const form = document.getElementById('userForm');
-                form.action = `/admin/users/${data.id}`;
-
-                // Show the modal
-                $('#editUserModal').modal('show');
-            });
-}
-
-function editRegisterUser(button) {
-    const userId = button.getAttribute('data-id'); // Get the user ID from the button
-
-    fetch(`/registrations/${userId}/edit`)
-    .then(response => {
-        if (!response.ok) {
-            console.error('HTTP Error:', response.status, response.statusText);
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        document.getElementById('name').value = data.name;
-        document.getElementById('age').value = data.age;
-        document.getElementById('phone').value = data.phone;
-        document.getElementById('event_id').value = data.event_id;
-
-        const form = document.getElementById('eventRegisterForm');
-        form.action = `/registrations/${userId}`;
-
-        const modal = new bootstrap.Modal(document.getElementById('editRegisterUser'));
-        modal.show();
-    })
-    .catch(error => {
-        console.error('Error fetching user data:', error);
     });
+});
 
-}
+$(document).on('click', '.delete-btn', function() {
+    var eventId = $(this).data('id'); 
+    
+    if (confirm('Are you sure you want to delete this event?')) {
+        $.ajax({
+            url: 'deleteEvent.php',
+            method: 'POST',
+            data: { event_id: eventId },
+            success: function(response) {
+                response = JSON.parse(response);  // Parse the JSON response
+                if (response.success) {
+                    alert('Event deleted successfully.');
+                    location.reload(); // Reload the page or update dynamically
+                } else {
+                    alert('Failed to delete the event. Error: ' + response.error);
+                }
+            },
+            error: function() {
+                alert('An error occurred while processing the request.');
+            }
+        });
+    }
+});
+
+$(document).on('click', '.view-btn', function() {
+    var userId = $(this).data('id');
+    
+    // Ajax request to fetch user data
+    $.ajax({
+        url: 'userInfos.php',
+        method: 'GET',
+        data: { user_id: userId },
+        success: function(response) {
+            var user = JSON.parse(response); // Parse JSON response
+            $('#modal-name').text(user.name);
+            $('#modal-email').text(user.email);
+            
+            // Format Signup Time
+            var signupTime = new Date(user.updated_at);
+            var formattedDate = signupTime.toLocaleDateString('en-GB', {
+                day: '2-digit',
+                month: 'long',
+                year: 'numeric'
+            });
+            var formattedTime = signupTime.toLocaleTimeString('en-GB', {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: true // Display in 12-hour format
+            });
+
+            $('#modal-signup-time').text(formattedDate + ' ' + formattedTime);
+            $('#modal-preferred-sport').text(user.preferred_sport);
+            $('#modal-skill-level').text(user.skill_level);
+        },
+        error: function() {
+            alert('Error fetching user details.');
+        }
+    });
+});
+
+$(document).on('click', '.remove-btn', function() {
+    var userId = $(this).data('id'); // Get user ID from data-id attribute
+
+    if (confirm('Are you sure you want to remove this user?')) {
+        $.ajax({
+            url: 'deleteUser.php', // Your PHP script to handle deletion
+            method: 'POST',
+            data: { user_id: userId },
+            success: function(response) {
+                if (response.success) {
+                    alert('User removed successfully.');
+                    location.reload();
+                } else {
+                    location.reload();
+                }
+            },
+            error: function() {
+                alert('An error occurred while processing the request.');
+            }
+        });
+    }
+});
+
+$(document).on('click', '.btn-approve', function () {
+    const registrationId = $(this).data('id');
+
+    $.ajax({
+        url: 'adminControl.php',
+        type: 'POST',
+        data: { id: registrationId, action: 'approve' },
+        success: function (response) {
+            if (response.success) {
+                $(this).closest('tr').find('td:last-child').html('<span class="text-success">Approved</span>');
+                alert('Registration approved successfully.');
+            } else {
+                alert('Approving Successful.');
+                window.location.reload();
+            }
+        },
+        error: function () {
+            alert('An error occurred.');
+        }
+    });
+});
+
+$(document).on('click', '.btn-reject', function () {
+    const registrationId = $(this).data('id');
+
+    $.ajax({
+        url: 'adminControl.php',
+        type: 'POST',
+        data: { id: registrationId, action: 'reject' },
+        success: function (response) {
+            if (response.success) {
+                $(this).closest('tr').remove();
+                alert('Registration rejected successfully.');
+            } else {
+                alert('Rejected Successfully.');
+                window.location.reload(); 
+            }
+        },
+        error: function () {
+            alert('An error occurred.');
+        }
+    });
+});
 
     // Utility function to generate random colors
 function getRandomColor() {
@@ -589,9 +745,9 @@ document.addEventListener('DOMContentLoaded', function () {
             // Use random colors for the background of the bars
             const ctx = document.getElementById('registrationsChart').getContext('2d');
             new Chart(ctx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
-                    labels: labels, // Event names
+                    labels: labels, 
                     datasets: [{
                         label: 'Registrations',
                         data: counts,

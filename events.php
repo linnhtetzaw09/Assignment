@@ -42,6 +42,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
             </button>
 
             <div id="nav" class="navbar-collapse collapse d-flex justify-content-between align-items-center text-uppercase fw-bold">
+
                         <ul class="navbar-nav d-flex align-items-center mb-0">
                             <li class="nav-item"><a href="index.php" class="nav-link mx-2 menuitems">Home</a></li>
                             <li class="nav-item"><a href="aboutus.php" class="nav-link mx-2 menuitems">About Us</a></li>
@@ -52,6 +53,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                                 <li class="nav-item"><a href="./admininterface/dashboard.php" class="nav-link mx-2 menuitems">Dashboard</a></li>
                             <?php endif; ?>
                         </ul>
+                        
                         <ul class="navbar-nav d-flex align-items-center mb-0">
                             <?php if (isset($_SESSION['name'])): ?>
                                 <li class="nav-item dropdown">
@@ -60,7 +62,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                                         <span class="text-white" style="margin-left: 10px;"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
                                     </a>
                                     <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                        <li><a href="editProfile.php" class="dropdown-item">Edit Profile</a></li>
+                                        <li><a href="userProfile.php" class="dropdown-item">Edit Profile</a></li>
                                         <li><a href="logout.php" class="dropdown-item">Logout</a></li>
                                     </ul>
                                 </li>
@@ -73,7 +75,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
                             <?php endif; ?>
                         </ul>
                             
-                    </div>
+            </div>
 
         </nav>
     <!-- end Nav bar -->
@@ -305,6 +307,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <script src="./assets/libs/jquery-ui-1.13.2/jquery-ui.min.js" type="text/javascript"></script>
     <!-- lightbox2 css1 js1 -->
     <script src="./assets/libs/lightbox2-2.11.4/dist/js/lightbox.min.js" type="text/javascript"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <!-- custom js -->
     <script src="./js/app.js" type="text/javascript"></script>
 

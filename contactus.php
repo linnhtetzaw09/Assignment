@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+include('mysql/db_connect.php');
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,13 +15,15 @@
     <!-- fav icon -->
     <link rel="icon" href="./assets/img/fav/favicon.png" type="image/png" sizes="16x16">
     <!-- bootstrap css1 js1 -->
-    <link rel="stylesheet" href="./assets/libs/bootstrap-5.3.2-dist/css/bootstrap.min.css"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- <link rel="stylesheet" href="./assets/libs/bootstrap-5.3.2-dist/css/bootstrap.min.css"/> -->
     <!-- fontawsome css1 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-1ycn6IcaQQ40/MKBW2W4Rhis/DbILU74C1vSrLJxCq57o941Ym01SwNsOMqvEBFlcgUa6xLiPY/NS5R+E6ztJQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- jquery ui css1 js1 -->
     <link rel="stylesheet" href="./assets/libs/jquery-ui-1.13.2/jquery-ui.min.css">
     <!-- lightbox2 css1 js1 -->
     <link rel="stylesheet" href="./assets/libs/lightbox2-2.11.4/dist/css/lightbox.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css">
     <!-- custom css -->
     <link rel="stylesheet" href="./css/style.css" type="text/css">
 
@@ -41,15 +51,41 @@
     <div class="bg-light lines3"></div>
 </button>
 
-<div id="nav" class="navbar-collapse collapse justify-content-end text-uppercase fw-bold">
-    <ul class=" navbar-nav">
-        <li class="nav-item"><a href="index.php" class="nav-link mx-2 menuitems">Home</a></li>
-        <li class="nav-item"><a href="aboutus.php" class="nav-link mx-2 menuitems">About Us</a></li>
-        <li class="nav-item"><a href="announcement.php" class="nav-link mx-2 menuitems">News & Announcements</a></li>
-        <li class="nav-item"><a href="events.php" class="nav-link mx-2 menuitems">Events</a></li>
-        <li class="nav-item"><a href="contactus.php" class="nav-link mx-2 menuitems">Contact</a></li>
-    </ul>
-</div>
+            <div id="nav" class="navbar-collapse collapse d-flex justify-content-between align-items-center text-uppercase fw-bold">
+
+                        <ul class="navbar-nav d-flex align-items-center mb-0">
+                            <li class="nav-item"><a href="index.php" class="nav-link mx-2 menuitems">Home</a></li>
+                            <li class="nav-item"><a href="aboutus.php" class="nav-link mx-2 menuitems">About Us</a></li>
+                            <li class="nav-item"><a href="announcement.php" class="nav-link mx-2 menuitems">News & Announcements</a></li>
+                            <li class="nav-item"><a href="events.php" class="nav-link mx-2 menuitems">Events</a></li>
+                            <li class="nav-item"><a href="contactus.php" class="nav-link mx-2 menuitems">Contact</a></li>
+                            <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin'] == 1): ?>
+                                <li class="nav-item"><a href="./admininterface/dashboard.php" class="nav-link mx-2 menuitems">Dashboard</a></li>
+                            <?php endif; ?>
+                        </ul>
+                        
+                        <ul class="navbar-nav d-flex align-items-center mb-0">
+                            <?php if (isset($_SESSION['name'])): ?>
+                                <li class="nav-item dropdown">
+                                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <i class="bi bi-person-circle align-icon" style="font-size: 1.5rem;"></i>
+                                        <span class="text-white" style="margin-left: 10px;"><?php echo htmlspecialchars($_SESSION['name']); ?></span>
+                                    </a>
+                                    <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                        <li><a href="userProfile.php" class="dropdown-item">Edit Profile</a></li>
+                                        <li><a href="logout.php" class="dropdown-item">Logout</a></li>
+                                    </ul>
+                                </li>
+                            <?php else: ?>
+                            <li class="nav-item">
+                                    <a href="login.php" class="nav-link">
+                                        <i class="bi bi-person-circle align-icon" style="font-size: 1.5rem;"></i> Login
+                                    </a>
+                                </li>
+                            <?php endif; ?>
+                        </ul>
+                            
+            </div>
 
 </nav>
 <!-- end Nav bar -->
@@ -196,7 +232,8 @@
 
 
     <!-- bootstrap css1 js1 -->
-    <script src="./assets/libs/bootstrap-5.3.2-dist/js/bootstrap.min.js" type="text/javascript"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="./assets/libs/bootstrap-5.3.2-dist/js/bootstrap.min.js" type="text/javascript"></script> -->
     <!-- jquery js1 -->
     <script src="./assets/libs/jquery/jquery-3.7.1.min.js" type="text/javascript"></script>
     <!-- jquery ui css1 js1 -->
