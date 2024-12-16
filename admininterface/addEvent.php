@@ -15,7 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle file upload for the image (optional)
     $event_image = null; 
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = '../assets/img';
+        $uploadDir = '../uploadimage/';
         $event_image = basename($_FILES['image']['name']);
         $targetPath = $uploadDir . $event_image;
 
