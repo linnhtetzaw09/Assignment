@@ -26,6 +26,78 @@ include('mysql/db_connect.php');
     <!-- custom css -->
     <link rel="stylesheet" href="./css/style.css" type="text/css">
     
+    <style>
+
+        /* Filter Section Styling */
+.filter-section {
+    background-color: #f8f9fa; /* Subtle light gray background */
+    border: 1px solid #ddd; /* Soft border for structure */
+    border-radius: 6px; /* Rounded corners */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Minimal shadow for depth */
+}
+
+/* Form Group Styling */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    min-width: 200px;
+}
+
+/* Label Styling */
+.form-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #333; /* Dark text for clarity */
+}
+
+/* Select and Input Styling */
+.form-control {
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #007bff; /* Highlighted border on focus */
+    box-shadow: 0 0 4px rgba(0, 123, 255, 0.3);
+    outline: none;
+}
+
+/* Button Styling */
+.btn-dark {
+    background-color: #343a40; /* Dark gray for a clean button look */
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn-dark:hover {
+    background-color: #23272b; /* Slightly darker on hover */
+}
+
+.filter{
+    margin-top: 23px;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    #filterForm {
+        flex-direction: column; /* Stack items vertically on smaller screens */
+        gap: 20px;
+    }
+
+    .form-group {
+        min-width: 100%; /* Full width for smaller devices */
+    }
+}
+
+
+    </style>
 
 </head>
 <body>
@@ -103,7 +175,62 @@ include('mysql/db_connect.php');
 
     <!-- end header section -->
 
+    <div class="filter-section p-4 mb-0">
+    <h2 class="text-center mb-3">Can Explore Your Interest !!</h2>
+    <form id="filterForm" method="GET" action="filter.php" class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
+    <!-- Sports Type -->
+    <div class="form-group">
+        <label for="sportType" class="form-label">Sport Type</label>
+        <select id="sportType" name="sport_type" class="form-control">
+            <option value="">Select Sport</option>
+            <option value="Football">Football</option>
+            <option value="Tennis">Tennis</option>
+            <option value="Swimming">Swimming</option>
+            <option value="Basketball">Basketball</option>
+            <option value="Ping Pong">Ping Pong</option>
+            <option value="Hiking">Hiking</option>
+            <option value="Marathon">Marathon</option>
+            <option value="Badminton">Badminton</option>
+        </select>
+    </div>
 
+    <!-- Location -->
+    <div class="form-group">
+        <label for="location" class="form-label">Location</label>
+        <select id="location" name="location" class="form-control">
+            <option value="">Select Location</option>
+            <option value="Mandalarthiri Stadium, Mandalay">Mandalarthiri Stadium, Mandalay</option>
+            <option value="Mandalarthiri Tennis Court, Mandalay">Mandalarthiri Tennis Court, Mandalay</option>
+            <option value="Club Sports Arena, Mandalay">Club Sports Arena, Mandalay</option>
+            <option value="Club Aquatic Center, Mandalay">Club Aquatic Center, Mandalay</option>
+            <option value="Amarapura Icon, Mandalay">Amarapura Icon, Mandalay</option>
+            <option value="Auston Campus, Mandalay">Auston Campus, Mandalay</option>
+        </select>
+    </div>
+
+    <!-- Age Group -->
+    <div class="form-group">
+        <label for="ageGroup" class="form-label">Age Group</label>
+        <select id="ageGroup" name="age_group" class="form-control">
+            <option value="">Select Age Group</option>
+            <option value="16 - 35 years">16 - 35 years</option>
+            <option value="18 - 50 years">18 - 50 years</option>
+            <option value="16 - unlimited years">16 - Unlimited years</option>
+        </select>
+    </div>
+
+    <!-- Filter Button -->
+    <div class="form-group filter">
+        <button type="submit" name="filter" class="btn btn-dark px-4">Filter</button>
+    </div>
+</form>
+
+</div>
+
+<!-- Event Container -->
+<div id="eventsContainer" class="row mt-4">
+    
+</div>
 
     <!-- start property section -->
 
@@ -336,6 +463,33 @@ include('mysql/db_connect.php');
     <!-- custom js -->
     <script src="./js/app.js" type="text/javascript"></script>
     
+    <script>
+        
+        $(document).ready(function() {
+        // Handle form submission
+        $('#filterForm').submit(function(e) {
+            e.preventDefault(); // Prevent default form submission
+
+            let formData = $(this).serialize(); // Serialize form data
+            
+            // Make AJAX request
+            $.ajax({
+                url: 'filter.php',
+                type: 'GET',
+                data: formData,
+                success: function(response) {
+                    // Insert the response into the eventsContainer
+                    $('#eventsContainer').html(response);
+                },
+                error: function() {
+                    alert('Something went wrong.');
+                }
+            });
+        });
+    });
+
+
+    </script>
     
 </body>
 </html>

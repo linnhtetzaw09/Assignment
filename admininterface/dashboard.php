@@ -38,12 +38,15 @@ if (!$result_events) {
 } 
 
 // Fetch all users from the users table
-$query_users = "SELECT id, name, email, preferred_sport, skill_level FROM users";
+$query_users = "SELECT id, name, email, preferred_sport, skill_level, is_admin FROM users";
 $result_users = $conn->query($query_users);
 
 if (!$result_users) {
     die("Error fetching users: " . $conn->error);
 }
+
+$noadmin_users = "SELECT id, name, email, preferred_sport, skill_level, is_admin FROM users WHERE is_admin = 0";
+$login_users = $conn->query($noadmin_users);
 
 
 // Fetch registrations from pending_users and registers
@@ -307,6 +310,57 @@ foreach ($allRegistrations as $key => $register) {
             </table>
         </div>
     </div>
+
+    <!-- Admin Management Section -->
+    <div class="mt-5">
+        <h2 class="text-secondary">All Admins</h2>
+
+        <!-- Users Table -->
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+                <thead class="table-dark text-center">
+                    <tr>
+                        <th>No.</th>
+                        <th>Admin Name</th>
+                        <th>Email</th>
+                        <th>Preferred Sport</th>
+                        <th>Skill Level</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-center">
+                    <?php if ($result_users->num_rows > 0): ?>
+                        <?php $counter = 1; ?>
+                        <?php while ($user = $result_users->fetch_assoc()): ?>
+                            <?php if ($user['is_admin'] == 1):  ?>
+                                <tr>
+                                    <td class="align-middle"><?php echo $counter++; ?></td>
+                                    <td class="align-middle"><?php echo htmlspecialchars($user['name']); ?></td>
+                                    <td class="align-middle"><?php echo htmlspecialchars($user['email']); ?></td>
+                                    <td class="align-middle"><?php echo htmlspecialchars($user['preferred_sport']); ?></td>
+                                    <td class="align-middle"><?php echo htmlspecialchars($user['skill_level']); ?></td>
+                                    <td class="align-middle">
+                                        <button type="button" class="btn btn-sm btn-primary view-btn" 
+                                            data-bs-toggle="modal" data-bs-target="#viewMemberModal" data-id="<?= $user['id']; ?>">
+                                             View
+                                        </button>
+                                        <button class="btn btn-sm btn-danger remove-btn" data-id="<?= $user['id']; ?>">
+                                             Remove
+                                        </button>
+                                    </td>
+                                </tr>
+                            <?php endif; ?>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6" class="text-center">No members found</td>
+                        </tr>
+                    <?php endif; ?>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
     
     <!-- User Management Section -->
     <div class="mt-5">
@@ -326,20 +380,22 @@ foreach ($allRegistrations as $key => $register) {
                     </tr>
                 </thead>
                 <tbody class="text-center">
-                <?php if ($result_users->num_rows > 0): ?>
-                    <?php while ($user = $result_users->fetch_assoc()): ?>
-                            <tr>
-                                <td class="align-middle"><?php echo htmlspecialchars($user['id']); ?></td>
+                    <?php if ($login_users->num_rows > 0): ?>
+                        <?php $counter = 1; ?>
+                        <?php while ($user = $login_users->fetch_assoc()): ?>
+                                <tr>
+                                <td class="align-middle"><?php echo $counter++; ?></td>
                                 <td class="align-middle"><?php echo htmlspecialchars($user['name']); ?></td>
                                 <td class="align-middle"><?php echo htmlspecialchars($user['email']); ?></td>
                                 <td class="align-middle"><?php echo htmlspecialchars($user['preferred_sport']); ?></td>
                                 <td class="align-middle"><?php echo htmlspecialchars($user['skill_level']); ?></td>
-                                <td>
-                                    <button type="button" class="btn btn-sm btn-warning view-btn" data-bs-toggle="modal" data-bs-target="#viewMemberModal" data-id="<?= $user['id']; ?>">
-                                        View
+                                <td class="align-middle">
+                                    <button type="button" class="btn btn-sm btn-primary view-btn" 
+                                        data-bs-toggle="modal" data-bs-target="#viewMemberModal" data-id="<?= $user['id']; ?>">
+                                         View
                                     </button>
-                                    <button type="submit" class="btn btn-sm btn-danger remove-btn" data-id="<?= $user['id']; ?>">
-                                        Remove
+                                    <button class="btn btn-sm btn-danger remove-btn" data-id="<?= $user['id']; ?>">
+                                         Remove
                                     </button>
                                 </td>
                             </tr>
@@ -448,7 +504,7 @@ foreach ($allRegistrations as $key => $register) {
                     </div>
                     <div class="mb-3">
                         <label for="edit_image" class="form-label">Event Image</label>
-                        <input type="file" class="form-control" id="edit_image" name="image">
+                        <input type="file" class="form-control" id="edit_image" name="image" required>
                     </div>
                     <div class="mb-3">
                         <label for="edit_description" class="form-label">Description</label>
@@ -591,6 +647,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     document.getElementById('edit_sport').value = data.sport;
                     document.getElementById('edit_age_group').value = data.age_group;
                     document.getElementById('edit_description').value = data.description;
+                    document.getElementById('edit_image').value = data.image;
                 })
                 .catch(error => console.error('Error fetching event data:', error));
         });

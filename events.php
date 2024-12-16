@@ -1,8 +1,17 @@
 <?php
 session_start();
+include('mysql/db_connect.php');
 
-$isLoggedIn = isset($_SESSION['user_id']);
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
+// Query to fetch events
+$sql = "SELECT * FROM events";
+$result = $conn->query($sql);
+
+$isLoggedIn = isset($_SESSION['user_id']); 
 ?>
 
 <!DOCTYPE html>
@@ -81,163 +90,105 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <!-- end Nav bar -->
 
     <section id="events" class="p-4 events">
-
-        <div class="container-fluid p-3 pt-5">
-
-            <!-- start title -->
-            <div class="text-center p-3 pt-5 mt-3 mb-3">
-                <div class="col">
-                    <h3 class="text-light titles">Our Coming Events</h3>
-                </div>
+    <div class="container-fluid p-3 pt-5">
+        <!-- Title Section -->
+        <div class="text-center p-3 pt-5 mt-3 mb-3">
+            <div class="col">
+                <h3 class="text-light titles">Our Coming Events</h3>
             </div>
-            <!-- end title -->
+        </div>
 
-            <div class="row">
+        <!-- Events Section -->
+        <div class="row">
+            <?php if ($result->num_rows > 0): ?>
+                <?php while ($event = $result->fetch_assoc()): ?>
+                    
+                    <div class="col-lg-6 col-md-9 col-sm-12 mb-3">
+    <div class="card eventscards border-0">
+        <img src="<?php echo './uploadimage/' . $event['image']; ?>" alt="<?php echo $event['title']; ?>">
+        <h5 class="text-white text-uppercase fw-bold p-2 headings"><?php echo $event['title']; ?></h5>
+    </div>
+    <div class="btn-container">
+        <a href="#" class="btn btn-info about-event-btn" data-bs-toggle="modal" 
+           data-bs-target="#eventInfoModal" 
+           data-event-id="<?php echo $event['id']; ?>">About Event</a>
+        <a href="#" class="btn register-btn" data-bs-toggle="modal" 
+           data-bs-target="#registerModal" 
+           data-event-id="<?php echo $event['id']; ?>" 
+           data-title="<?php echo $event['title']; ?>">Register Now</a>
+    </div>
+</div>
 
-            <div class="col-lg-6 col-md-9 col-sm-12 mb-3">
-                <div class="card eventscards border-0">
-                    <img src="./assets/img/gallery/footballbg.jpg" class="" alt="football" />
-                    <h5 class="text-white text-uppercase fw-bold p-2 headings">Football Tournament 2025</h5>
-                </div>
-            
-                <div class="btn-container">
-                    <a href="#" onclick="footballEventInfo()" id="football" class="btn">About Event</a>
-                    <a href="#" class="btn register-btn" data-bs-toggle="modal" data-bs-target="#registerModal" data-event-id="1" data-title="Football Tournament 2025">Register Now</a>
-                </div>
-            </div>
-            
-            <!-- Event Information Section (Initially Hidden) -->
-            <div id="footballEventInfo" class="event-info">
-                <h3 class="text-white">Event Information</h3>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Date:</strong> <span id="eventDate">March 15–17, 2024</span></li>
-                    <li class="list-group-item"><strong>Time:</strong> <span id="eventTime">9:00 AM</span></li>
-                    <li class="list-group-item"><strong>Location:</strong> <span id="eventLocation">Stadium ABC, City XYZ</span></li>
-                    <li class="list-group-item"><strong>Sport:</strong> <span id="eventSport">Football</span></li>
-                    <li class="list-group-item"><strong>Age Group:</strong> <span id="eventAgeGroup">18-25 years</span></li>
-                    <li class="list-group-item"><strong>Description:</strong> <span id="eventDescription">A thrilling football competition for young athletes!</span></li>
-                </ul>
-                <button type="button" class="back-btn" data-event="footballEventInfo">Back</button>
-            </div>
-
-            <div class="col-lg-6 col-md-9 col-sm-12 mb-3">
-                <div class="card eventscards border-0">
-                    <img src="./assets/img/gallery/tennisbg.jpg" class="" alt="tennis" />
-                    <h5 class="text-white text-uppercase fw-bold p-2 headings">Tennis Tournament 2025</h5>
-                </div>
-
-                <div class="btn-container">
-                    <a href="#" onclick="tennisEventInfo()" id="tennis" class="btn">About Event</a>
-                    <a href="#" class="btn register-btn" data-bs-toggle="modal" data-bs-target="#registerModal" data-event-id="2" data-title="Tennis Tournament 2025">Register Now</a>
-                </div>
-            </div>
-
-            <div id="tennisEventInfo" class="event-info">
-                <h3 class="text-white">Event Information</h3>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Date:</strong> <span id="eventDate">April 20–22, 2024</span></li>
-                    <li class="list-group-item"><strong>Time:</strong> <span id="eventTime">8:00 AM</span></li>
-                    <li class="list-group-item"><strong>Location:</strong> <span id="eventLocation">Tennis Courts XYZ</span></li>
-                    <li class="list-group-item"><strong>Sport:</strong> <span id="eventSport">Tennis</span></li>
-                    <li class="list-group-item"><strong>Age Group:</strong> <span id="eventAgeGroup">16-30 years</span></li>
-                    <li class="list-group-item"><strong>Description:</strong> <span id="eventDescription">A competitive tennis tournament for all skill levels</span></li>
-                </ul>
-                <button type="button" class="back-btn" data-event="tennisEventInfo">Back</button>
-            </div>
-
-            <div class="col-lg-6 col-md-9 col-sm-12 mb-3">
-                <div class="card eventscards border-0">
-                    <img src="./assets/img/gallery/swimbg.jpg" class="" alt="swimming" />
-                    <h5 class="text-white text-uppercase fw-bold p-2 headings">Swimming Championship 2025</h5>
-                </div>
-
-                <div class="btn-container">
-                    <a href="#" onclick="swimEventInfo()" id="swim" class="btn">About Event</a>
-                    <a href="#" class="btn register-btn" data-bs-toggle="modal" data-bs-target="#registerModal" data-event-id="3" data-title="Swimming Championship 2025">Register Now</a>
-                </div>
-            </div>
-
-            <div id="swimEventInfo" class="event-info">
-                <h3 class="text-white">Event Information</h3>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Date:</strong> <span id="eventDate">December 10 - 12, 2024</span></li>
-                    <li class="list-group-item"><strong>Time:</strong> <span id="eventTime">8:00 AM</span></li>
-                    <li class="list-group-item"><strong>Location:</strong> <span id="eventLocation">Club Aquatic Center</span></li>
-                    <li class="list-group-item"><strong>Sport:</strong> <span id="eventSport">Swimming</span></li>
-                    <li class="list-group-item"><strong>Age Group:</strong> <span id="eventAgeGroup">12-25 years</span></li>
-                    <li class="list-group-item"><strong>Description:</strong> <span id="eventDescription">A race for swimmers of all levels to showcase their skills.</span></li>
-                </ul>
-                <button type="button" class="back-btn" data-event="swimEventInfo">Back</button>
-            </div>
-
-            <div class="col-lg-6 col-md-9 col-sm-12 mb-3">
-                <div class="card eventscards border-0">
-                    <img src="./assets/img/gallery/basketbg.jpg" class="" alt="basketball" />
-                    <h5 class="text-white text-uppercase fw-bold p-2 headings">Basketball League 2025</h5>
-                </div>
-
-                <div class="btn-container">
-                    <a href="#" onclick="basketEventInfo()" id="basket" class="btn">About Event</a>
-                    <a href="#" class="btn register-btn" data-bs-toggle="modal" data-bs-target="#registerModal" data-event-id="4" data-title="Basketball League 2025">Register Now</a>
-                </div>
-            </div>
-
-            <div id="basketEventInfo" class="event-info">
-                <h3 class="text-white">Event Information</h3>
-                <ul class="list-group">
-                    <li class="list-group-item"><strong>Date:</strong> <span id="eventDate">April 5–20, 2024</span></li>
-                    <li class="list-group-item"><strong>Time:</strong> <span id="eventTime">6:00 PM</span></li>
-                    <li class="list-group-item"><strong>Location:</strong> <span id="eventLocation">Club Sports Arena</span></li>
-                    <li class="list-group-item"><strong>Sport:</strong> <span id="eventSport">Basketball</span></li>
-                    <li class="list-group-item"><strong>Age Group:</strong> <span id="eventAgeGroup">18-30 years</span></li>
-                    <li class="list-group-item"><strong>Description:</strong> <span id="eventDescription">A competitive basketball league for teams.</span></li>
-                </ul>
-                <button type="button" class="back-btn" data-event="basketEventInfo">Back</button>
-            </div>
-
+                <?php endwhile; ?>
+            <?php else: ?>
+                <p class="text-center">No events found.</p>
+            <?php endif; ?>
         </div>
         
-        <!-- Registration Modal (Single for All Events) -->
-<div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
+    </div>
+
+    <!-- Registration Modal -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">Register for Event</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <?php if ($isLoggedIn): ?>
+                        <form id="registrationForm" action="register.php" method="POST">
+                            <div class="mb-3">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" class="form-control" id="name" name="name" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="age" class="form-label">Age</label>
+                                <input type="number" class="form-control" id="age" name="age" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                            <input type="hidden" id="event_id" name="event_id" value="">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </form>
+                    <?php else: ?>
+                        <p class="text-center">You must be logged in to register.</p>
+                        <p class="text-center"><a href="login.php">Login here</a> to continue.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for Event Info -->
+<div class="modal fade" id="eventInfoModal" tabindex="-1" aria-labelledby="eventInfoModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content text-center">
             <div class="modal-header">
-                <h5 class="modal-title" id="registerModalLabel">Register for Event</h5>
+                <h5 class="modal-title" id="eventInfoModalLabel">Event Information</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <?php if ($isLoggedIn): ?>
-                    <form id="registrationForm" action="register.php" method="POST">
-                        <div class="mb-3">
-                            <label for="name" class="form-label">Name</label>
-                            <input type="text" class="form-control" id="name" name="name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="age" class="form-label">Age</label>
-                            <input type="number" class="form-control" id="age" name="age" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="phone" class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control" id="phone" name="phone" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" required>
-                        </div>
-                        <input type="hidden" id="event_id" name="event_id" value="">
-                        <button type="submit" class="btn btn-primary">Submit</button>
-                    </form>
-                <?php else: ?>
-                    <p class="text-center">You must be logged in to register.</p>
-                    <p class="text-center"><a href="login.php">Login here</a> to continue.</p>
-                <?php endif; ?>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Date:</strong> <span id="modal-event-date"></span></li>
+                    <li class="list-group-item"><strong>Time:</strong> <span id="modal-event-time"></span></li>
+                    <li class="list-group-item"><strong>Location:</strong> <span id="modal-event-location"></span></li>
+                    <li class="list-group-item"><strong>Sport:</strong> <span id="modal-event-sport"></span></li>
+                    <li class="list-group-item"><strong>Age Group:</strong> <span id="modal-event-age-group"></span></li>
+                    <li class="list-group-item"><strong>Description:</strong> <span id="modal-event-description"></span></li>
+                </ul>
             </div>
         </div>
     </div>
 </div>
-        </div>
 
-    </section>
+</section>
 
     <!-- start footer section -->
 
@@ -312,23 +263,51 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <script src="./js/app.js" type="text/javascript"></script>
 
 <script>
+
+$(document).ready(function() {
+    
+    $('.about-event-btn').on('click', function(e) {
+        e.preventDefault();
+        var eventId = $(this).data('event-id'); 
+
+        $.ajax({
+            url: './admininterface/getEvent.php',
+            method: 'GET',
+            data: { id: eventId },
+            dataType: 'json',
+            success: function(data) {
+                if (data.error) {
+                    alert(data.error); 
+                } else {
+                    $('#modal-event-date').text(data.event_date);
+                    $('#modal-event-time').text(data.time);
+                    $('#modal-event-location').text(data.location);
+                    $('#modal-event-sport').text(data.sport);
+                    $('#modal-event-age-group').text(data.age_group);
+                    $('#modal-event-description').text(data.description);
+                }
+            },
+            error: function() {
+                alert('Error fetching event details.');
+            }
+        });
+    });
+});
+
     
     document.addEventListener('DOMContentLoaded', () => {
     // Select all buttons with the 'register-btn' class
     const registerButtons = document.querySelectorAll('.register-btn');
 
-    // Loop through the buttons and add event listeners
     registerButtons.forEach(button => {
         button.addEventListener('click', () => {
             // Get the event ID and event title from the button's attributes
             const eventId = button.getAttribute('data-event-id');
             const eventTitle = button.getAttribute('data-title');
             
-            // Update the modal title with the event title
             const modalTitle = document.getElementById('registerModalLabel');
             modalTitle.textContent = `Register for ${eventTitle}`;
             
-            // Set the hidden event_id input field in the form
             const eventIdInput = document.getElementById('event_id');
             eventIdInput.value = eventId;
         });

@@ -12,11 +12,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ageGroup = $_POST['age_group'];
     $eventDescription = $_POST['description'];
 
-    $newImageUploaded = false;
+    $uploadDir = '../uploadimage/';
     $eventImage = null;
+    $newImageUploaded = false;
 
+    // Handle image upload
     if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = '../assets/img';
         $eventImage = basename($_FILES['image']['name']);
         $targetPath = $uploadDir . $eventImage;
 
@@ -28,26 +29,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    if ($newImageUploaded) {
-        $stmt = $conn->prepare("UPDATE events SET 
-            title = ?, event_date = ?, time = ?, location = ?, sport = ?, age_group = ?, description = ?, image = ? WHERE id = ?");
-        $stmt->bind_param("ssssssssi", $eventName, $eventDate, $eventTime, $eventLocation, $sport, $ageGroup, $eventDescription, $eventImage, $eventId);
-    } else {
-        $stmt = $conn->prepare("UPDATE events SET 
-            title = ?, event_date = ?, time = ?, location = ?, sport = ?, age_group = ?, description = ? WHERE id = ?");
-        $stmt->bind_param("sssssssi", $eventName, $eventDate, $eventTime, $eventLocation, $sport, $ageGroup, $eventDescription, $eventId);
-    }
+    // Prepare SQL query
+    try {
+        if ($newImageUploaded) {
+            $query = "UPDATE events SET 
+                title = ?, event_date = ?, time = ?, location = ?, sport = ?, age_group = ?, description = ?, image = ? 
+                WHERE id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("ssssssssi", $eventName, $eventDate, $eventTime, $eventLocation, $sport, $ageGroup, $eventDescription, $eventImage, $eventId);
+        } else {
+            $query = "UPDATE events SET 
+                title = ?, event_date = ?, time = ?, location = ?, sport = ?, age_group = ?, description = ? 
+                WHERE id = ?";
+            $stmt = $conn->prepare($query);
+            $stmt->bind_param("sssssssi", $eventName, $eventDate, $eventTime, $eventLocation, $sport, $ageGroup, $eventDescription, $eventId);
+        }
 
-    if ($stmt->execute()) {
-        header("Location: dashboard.php?success=Event updated successfully.");
-        exit();
-    } else {
-        echo "Error: " . $stmt->error;
-        exit();
+        // Execute query
+        if ($stmt->execute()) {
+            header("Location: dashboard.php?success=Event updated successfully.");
+        } else {
+            header("Location: dashboard.php?error=Failed to update event.");
+        }
+        $stmt->close();
+    } catch (Exception $e) {
+        error_log("Error updating event: " . $e->getMessage());
+        header("Location: dashboard.php?error=An unexpected error occurred.");
+    } finally {
+        $conn->close();
     }
-
-    $stmt->close();
-    $conn->close();
 }
-
 ?>
