@@ -466,27 +466,29 @@ include('mysql/db_connect.php');
     <script>
         
         $(document).ready(function() {
-        // Handle form submission
-        $('#filterForm').submit(function(e) {
-            e.preventDefault(); // Prevent default form submission
+    // Handle form submission
+    $('#filterForm').submit(function(e) {
+        e.preventDefault(); // Prevent default form submission
 
-            let formData = $(this).serialize(); // Serialize form data
-            
-            // Make AJAX request
-            $.ajax({
-                url: 'filter.php',
-                type: 'GET',
-                data: formData,
-                success: function(response) {
-                    // Insert the response into the eventsContainer
-                    $('#eventsContainer').html(response);
-                },
-                error: function() {
-                    alert('Something went wrong.');
-                }
-            });
+        let formData = $(this).serialize(); // Serialize form data
+        formData += '&filter=true'; // Append the filter parameter
+
+        // Make AJAX request
+        $.ajax({
+            url: 'filter.php',
+            type: 'GET',
+            data: formData,
+            success: function(response) {
+                // Insert the response into the eventsContainer
+                $('#eventsContainer').html(response);
+            },
+            error: function() {
+                alert('Something went wrong.');
+            }
         });
     });
+});
+
 
 
     </script>
