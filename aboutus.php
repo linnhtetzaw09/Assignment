@@ -28,6 +28,34 @@ include('mysql/db_connect.php');
             margin-top: 0;
         }
 
+        #mission-vision .lines {
+            height: 3px;
+            background-color: #333;
+            width: 80px;
+            margin: 0 auto;
+        }
+
+        .mission-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        outline: none; /* Remove outline when focused */
+    }
+
+    /* Scale effect on hover or focus */
+    .mission-card:hover,
+    .mission-card:focus-within {
+        transform: scale(1.1);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Reset the scale of other cards */
+    .mission-card:hover ~ .mission-card,
+    .mission-card:focus-within ~ .mission-card {
+        transform: scale(0.95);
+        box-shadow: none;
+    }
+
+
     </style>
 
 </head>
@@ -129,6 +157,48 @@ include('mysql/db_connect.php');
         </section>
 
     <!-- end about us section -->
+
+    <!-- start mission, vision, and core values section -->
+<section id="mission-vision" class="py-5 bg-light text-dark">
+    <div class="container">
+        <div class="row">
+            <!-- Mission Section -->
+            <div class="col-md-4 text-center mb-4">
+                <div tabindex="0" class="p-4 bg-white rounded shadow-sm mission-card">
+                    <h2 class="text-uppercase fw-bold">Our Mission</h2>
+                    <div class="lines mb-3"></div>
+                    <p class="fw-bold">To inspire and empower students to lead active and healthy lives through inclusive sports activities, fostering teamwork, and promoting personal and professional growth within the Auston University community.</p>
+                </div>
+            </div>
+            
+            <!-- Vision Section -->
+            <div class="col-md-4 text-center mb-4">
+                <div tabindex="0" class="p-4 bg-white rounded shadow-sm mission-card">
+                    <h2 class="text-uppercase fw-bold">Our Vision</h2>
+                    <div class="lines mb-3"></div>
+                    <p class="fw-bold">To be a leading example of a student-driven sports club that fosters a culture of excellence, unity, and wellness in every aspect of campus life, inspiring future generations to value the importance of sports and well-being.</p>
+                </div>
+            </div>
+
+            <!-- Core Values Section -->
+            <div tabindex="0" class="col-md-4 text-center mb-4">
+                <div class="p-4 bg-white rounded shadow-sm mission-card">
+                    <h2 class="text-uppercase fw-bold">Our Core Values</h2>
+                    <div class="lines mb-3"></div>
+                    <ul class="list-unstyled fw-light text-center fw-bold">
+                        <li><i class="bi bi-check-circle text-success"></i> Integrity</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Inclusivity</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Teamwork</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Wellness</li>
+                        <li><i class="bi bi-check-circle text-success"></i> Leadership</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- end mission, vision, and core values section -->
+
 
     <!-- start teammembers section -->
 

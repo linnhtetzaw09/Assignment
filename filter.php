@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['filter'])) {
     $sport_type = !empty($_GET['sport_type']) ? mysqli_real_escape_string($conn, $_GET['sport_type']) : '';
     $location = !empty($_GET['location']) ? mysqli_real_escape_string($conn, $_GET['location']) : '';
     $age_group = !empty($_GET['age_group']) ? mysqli_real_escape_string($conn, $_GET['age_group']) : '';
-
+    $month = !empty($_GET['month']) ? mysqli_real_escape_string($conn, $_GET['month']) : '';
 
     // Apply the filters to the query
     if (!empty($sport_type)) {
@@ -25,6 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['filter'])) {
     }
     if (!empty($age_group)) {
         $query .= " AND age_group = '$age_group'";
+    }
+    if (!empty($month)) {
+        // Convert month name to a numeric value for comparison with event_date (assuming event_date is in 'YYYY-MM-DD' format)
+        $month_number = date('m', strtotime($month));
+        $query .= " AND MONTH(event_date) = '$month_number'";
     }
 }
 
@@ -49,7 +54,7 @@ if ($result->num_rows > 0) {
     }
     echo '</div>'; // Close eventsContainer
 } else {
-    echo '<p>No events found matching your criteria.</p>';
+    echo '<p class="text-center">No events found matching your criteria.</p>';
 }
 
 $conn->close();

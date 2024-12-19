@@ -94,10 +94,10 @@ include('mysql/db_connect.php');
 
 <section id="contact" class="p-5 contacts">
         <div class="container-fluid">
-            <div class="col-md-5 mx-auto py-5 mt-4">
+            <div class="col-md-5 mx-auto">
                 <h5 class="display-4 mb-3 text-center text-white fw-bold">Stay Updated with Announcements</h5>
 
-                <form method="POST" action="">
+                <form id="signupForm" method="POST" action="signupload.php">
                     
                     <div class="form-group py-3 my-2">
                         <label for="name" class="labels">Full Name <span class="text-danger">* required</span></label>
@@ -127,7 +127,7 @@ include('mysql/db_connect.php');
                         />
                     </div>
 
-                    <div class="form-group py-3">
+                    <<div class="form-group py-3">
                         <label for="password" class="labels">Password <span class="text-danger">* required</span></label>
                         <input 
                             type="password" 
@@ -137,25 +137,29 @@ include('mysql/db_connect.php');
                             placeholder="Enter your password" 
                             required 
                             autocomplete="off"
+                            minlength="8"
+                            pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}"
+                            title="Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
                         />
                     </div>
 
                     <div class="form-group py-3">
-                        <label for="password_confirmation" class="labels">Confirm Password <span class="text-danger">* required</span></label>
+                        <label for="confirm_password" class="labels">Confirm Password <span class="text-danger">* required</span></label>
                         <input 
                             type="password" 
-                            id="password_confirmation" 
-                            name="password_confirmation" 
+                            id="confirm_password" 
+                            name="confirm_password" 
                             class="form-control p-3 inputs" 
                             placeholder="Confirm your password" 
                             required 
                             autocomplete="off"
+                            oninput="this.setCustomValidity(this.value !== document.getElementById('password').value ? 'Passwords do not match' : '')"
                         />
                     </div>
 
                     <div class="my-4">
                         <div class="form-check">
-                            <input type="checkbox" id="accept" name="accept" class="form-check-input" />
+                            <input type="checkbox" id="accept" name="accept" class="form-check-input" required />
                             <label for="accept" class="form-check-label text-light">I agree to receive notifications</label>
                         </div>
                     </div>
@@ -164,11 +168,13 @@ include('mysql/db_connect.php');
                         <button type="submit" class="btn text-uppercase fw-bold rounded-0 submit-btns">Sign Up</button>
                     </div>
                 </form>
+
+                <?php if (isset($error)) { echo "<p class='text-danger'>$error</p>"; } ?>
                 
-                <p class="text-center text-white mt-3">Already have an account? <a href="login.php" class="text-underline">Login here</a></p>
+                <p class="text-center text-white mt-3">Already have an account? <a href="login.php" class="text-decoration-none">Login here</a></p>
             </div>
         </div>
-</section>
+    </section>
     
     <!-- end contact section -->
 
@@ -226,7 +232,7 @@ include('mysql/db_connect.php');
                     </ul>
                 </div>
             </div>
-        </footer>
+</footer>
 
     <!-- end footer section -->
 
@@ -242,6 +248,30 @@ include('mysql/db_connect.php');
     <script src="./assets/libs/lightbox2-2.11.4/dist/js/lightbox.min.js" type="text/javascript"></script>
     <!-- custom js -->
     <script src="./js/app.js" type="text/javascript"></script>
+
+    <script>
+        $(document).on('submit', '#signupForm', function(e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: 'signupload.php',
+                type: 'POST',
+                data: $(this).serialize(),
+                success: function(response) {
+                    var res = JSON.parse(response); 
+                    if (res.success) {
+                        window.location.href = 'login.php'; 
+                    } else {
+                        alert('Failed to sign up: ' + res.error); 
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX error:', xhr, status, error); 
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        });
+    </script>
     
 </body>
 </html>

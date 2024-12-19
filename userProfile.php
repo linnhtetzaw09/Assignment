@@ -22,19 +22,8 @@ $stmt->execute();
 $result = $stmt->get_result();
 $user = $result->fetch_assoc();
 
-// Fetch user's event history
-$query_events = "SELECT e.title, e.event_date, e.time 
-                 FROM events e 
-                 JOIN registers r ON e.id = r.event_id
-                 WHERE r.email = ? 
-                 ORDER BY e.event_date DESC, e.time DESC";  
-$stmt_events = $conn->prepare($query_events);
-$stmt_events->bind_param("s", $user['email']);  // Use email to match user registrations
-$stmt_events->execute();
-$result_events = $stmt_events->get_result();
-
-// Check if form is submitted to update profile
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+// Check if the form is submitted to update the profile
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['name'], $_POST['email'])) {
   // Retrieve and trim input values
   $name = trim($_POST['name']);
   $email = trim($_POST['email']);
@@ -63,6 +52,40 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       }
   } else {
       echo "<script>alert('Please fill in all fields.');</script>";
+  }
+}
+
+// Fetch user's event history
+$query_events = "SELECT e.id AS event_id, e.title, e.event_date, e.time 
+                 FROM events e 
+                 JOIN registers r ON e.id = r.event_id
+                 WHERE r.email = ? 
+                 ORDER BY e.event_date DESC, e.time DESC";  
+$stmt_events = $conn->prepare($query_events);
+$stmt_events->bind_param("s", $user['email']);  // Use email to match user registrations
+$stmt_events->execute();
+$result_events = $stmt_events->get_result();
+
+// Handle form submission to unregister from an event
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['event_id'])) {
+  $event_id = intval($_POST['event_id']); // Get event ID from form
+  try {
+      // Delete the registration record from the registers table
+      $delete_query = "DELETE FROM registers WHERE event_id = ? AND email = ?";
+      $delete_stmt = $conn->prepare($delete_query);
+      $delete_stmt->bind_param("is", $event_id, $user['email']);
+      $delete_stmt->execute();
+
+      if ($delete_stmt->affected_rows > 0) {
+          echo "<script>
+                  alert('You have successfully unregistered from the event.');
+                  window.location.href = 'userProfile.php';
+                </script>";
+      } else {
+          echo "<script>alert('Error: Unable to unregister from the event.');</script>";
+      }
+  } catch (Exception $e) {
+      echo "<script>alert('Error: " . $e->getMessage() . "');</script>";
   }
 }
 
@@ -184,10 +207,13 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                   <div class="w-100 mt-2 mt-sm-0 d-flex justify-content-end align-items-center">
                     <?php if (strtotime($event['event_date']) > time()): ?>
                       <span class="badge bg-success">Upcoming</span>
-                      <button class="btn btn-outline-primary btn-sm ms-2">Unregister</button>
+                      <form action="" method="POST" class="ms-2">
+                          <input type="hidden" name="event_id" value="<?php echo $event['event_id']; ?>"/>
+                          <button type="submit" name="unregister" class="btn btn-outline-primary btn-sm">Unregister</button>
+                      </form>
                     <?php else: ?>
                       <span class="badge bg-warning">Completed</span>
-                      <button class="btn btn-outline-danger btn-sm ms-2">Finished</button>
+                      <button class="btn btn-outline-danger btn-sm ms-2" disabled>Finished</button>
                     <?php endif; ?>
                   </div>
                 </li>
@@ -196,6 +222,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
           </div>
         </div>
       </div>
+
     </div>
   </div>
 </section>

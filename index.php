@@ -176,6 +176,7 @@ include('mysql/db_connect.php');
     <!-- end header section -->
 
     <div class="filter-section p-4 mb-0">
+
     <h2 class="text-center mb-3">Can Explore Your Interest !!</h2>
     <form id="filterForm" method="GET" action="filter.php" class="d-flex justify-content-center align-items-center gap-4 flex-wrap">
     <!-- Sports Type -->
@@ -208,6 +209,26 @@ include('mysql/db_connect.php');
         </select>
     </div>
 
+    <!-- Month -->
+    <div class="form-group">
+            <label for="month" class="form-label">Month</label>
+            <select id="month" name="month" class="form-control">
+                <option value="">Select Month</option>
+                <option value="January">January</option>
+                <option value="February">February</option>
+                <option value="March">March</option>
+                <option value="April">April</option>
+                <option value="May">May</option>
+                <option value="June">June</option>
+                <option value="July">July</option>
+                <option value="August">August</option>
+                <option value="September">September</option>
+                <option value="October">October</option>
+                <option value="November">November</option>
+                <option value="December">December</option>
+            </select>
+    </div>
+
     <!-- Age Group -->
     <div class="form-group">
         <label for="ageGroup" class="form-label">Age Group</label>
@@ -223,9 +244,9 @@ include('mysql/db_connect.php');
     <div class="form-group filter">
         <button type="submit" name="filter" class="btn btn-dark px-4">Filter</button>
     </div>
-</form>
+    </form>
 
-</div>
+    </div>
 
 <!-- Event Container -->
 <div id="eventsContainer" class="row mt-4">

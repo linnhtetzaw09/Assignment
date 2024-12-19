@@ -549,7 +549,7 @@ foreach ($allRegistrations as $key => $register) {
 </div>
 
 <div class="container mt-3 mb-5">
-    <h1 class="text-center mb-3">Text U want to give title </h1>
+    <h1 class="text-center mb-3"> Chart based upon events that users registered </h1>
     <canvas id="registrationsChart"></canvas>
 </div>
 

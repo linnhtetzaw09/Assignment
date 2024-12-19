@@ -19,8 +19,8 @@
 
                 <form id="signupForm" method="POST" action="signupload.php">
                     
-                    <div class="form-group py-3 my-2">
-                        <label for="name" class="labels">Full Name <span class="text-danger">* required</span></label>
+                    <div class="form-group py-1 my-2">
+                        <label for="name" class="labels fw-bold">Full Name</label>
                         <input 
                             type="text" 
                             id="name" 
@@ -33,8 +33,8 @@
                         />
                     </div>
 
-                    <div class="form-group py-3">
-                        <label for="email" class="labels">Email Address <span class="text-danger">* required</span></label>
+                    <div class="form-group py-1">
+                        <label for="email" class="labels fw-bold">Email Address</label>
                         <input 
                             type="email" 
                             id="email" 
@@ -47,8 +47,8 @@
                         />
                     </div>
 
-                    <div class="form-group py-3">
-                        <label for="password" class="labels">Password <span class="text-danger">* required</span></label>
+                    <<div class="form-group py-1">
+                        <label for="password" class="labels fw-bold">Password</label>
                         <input 
                             type="password" 
                             id="password" 
@@ -57,11 +57,14 @@
                             placeholder="Enter your password" 
                             required 
                             autocomplete="off"
+                            minlength="8"
+                            pattern="(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}"
+                            title="Password must be at least 8 characters long, include at least one uppercase letter, one lowercase letter, one number, and one special character."
                         />
                     </div>
 
-                    <div class="form-group py-3">
-                        <label for="password_confirmation" class="labels">Confirm Password <span class="text-danger">* required</span></label>
+                    <div class="form-group py-1">
+                        <label for="confirm_password" class="labels fw-bold">Confirm Password</label>
                         <input 
                             type="password" 
                             id="confirm_password" 
@@ -70,7 +73,48 @@
                             placeholder="Confirm your password" 
                             required 
                             autocomplete="off"
+                            oninput="this.setCustomValidity(this.value !== document.getElementById('password').value ? 'Passwords do not match' : '')"
                         />
+                    </div>
+
+                    <div class="form-group py-1">
+                        <label for="age" class="labels fw-bold">Age</label>
+                        <input 
+                            type="number" 
+                            id="age" 
+                            name="age" 
+                            class="form-control p-3 inputs" 
+                            placeholder="Enter your age" 
+                            value="" 
+                            required 
+                            min="1" 
+                            max="120"
+                        />
+                    </div>
+
+                    <div class="form-group py-3">
+                        <label for="preferred_sport" class="labels fw-bold my-1">Preferred Sport</label>
+                        <select class="form-select" id="preferred_sport" name="preferred_sport">
+                            <option value="" disabled selected>Choose your preferred sport</option>
+                            <option value="Football">Football</option>
+                            <option value="Tennis">Tennis</option>
+                            <option value="Swimming">Swimming</option>
+                            <option value="Cycling">Cycling</option>
+                            <option value="Basketball">Basketball</option>
+                            <option value="Hiking">Hiking</option>
+                            <option value="PingPong">Ping Pong</option>
+                            <option value="Marathon">Marathon</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group py-3">
+                        <label for="skill_level" class="labels fw-bold my-1">Skill Level</label>
+                        <select class="form-select" id="skill_level" name="skill_level">
+                            <option value="" disabled selected>Choose your skill level</option>
+                            <option value="Beginner">Beginner</option>
+                            <option value="Player">Player</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
                     </div>
 
                     <div class="my-4">
